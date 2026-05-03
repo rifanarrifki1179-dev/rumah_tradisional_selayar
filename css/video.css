@@ -1,0 +1,137 @@
+/* =======================
+   RESET & GLOBAL
+======================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #020617, #020617);
+  color: #e5e7eb;
+  min-height: 100vh;
+}
+
+/* =======================
+   HEADER
+======================= */
+.video-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.video-title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* =======================
+   BUTTONS
+======================= */
+.btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-outline {
+  color: #4fd1c5;
+  border: 1px solid #4fd1c5;
+}
+
+.btn-outline:hover {
+  background: rgba(79, 209, 197, 0.1);
+}
+
+.btn-primary {
+  background: #38bdf8;
+  color: #020617;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+/* =======================
+   MAIN CONTENT
+======================= */
+.video-page {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.video-card {
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* =======================
+   VIDEO FRAME
+======================= */
+.video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: black;
+}
+
+.video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* =======================
+   CAPTION
+======================= */
+.video-caption {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #cbd5f5;
+  text-align: center;
+}
+
+/* =======================
+   MOBILE RESPONSIVE
+======================= */
+@media (max-width: 480px) {
+  .video-header {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "back youtube"
+      "title title";
+  }
+
+  .btn-outline {
+    grid-area: back;
+  }
+
+  .btn-primary {
+    grid-area: youtube;
+    text-align: center;
+  }
+
+  .video-title {
+    grid-area: title;
+    margin-top: 10px;
+  }
+}
+
