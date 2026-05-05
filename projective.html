@@ -1,358 +1,681 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etnomatematika Rumah Adat Selayar</title>
-    <link rel="stylesheet" href="projective.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        /* Gaya Global */
-        :root {
-            --color-primary: #007bff;
-            --color-dark: #121212;
-            --color-light: #f4f4f4;
-            --color-text-light: #e0e0e0;
-            --color-text-muted: #aaaaaa;
-            --color-bg-card: #1e1e1e;
-        }
+  <title>Projective Geometry Rumah Adat Selayar</title>
 
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: var(--color-dark);
-            color: var(--color-text-light);
-            transition: background-color 0.3s;
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        /* Struktur Kontainer */
-        .shell {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
 
-        /* Header dan Summary */
-        header {
-            background-color: var(--color-bg-card);
-            border-bottom: 2px solid var(--color-primary);
-            padding: 40px 20px;
-            text-align: center;
-        }
-        header h1 {
-            margin-top: 0;
-            font-size: 2.2em;
-            color: white;
-            letter-spacing: 1px;
-        }
-        .summary-intro {
-            font-size: 1em;
-            margin-top: 15px;
-            padding: 0 5%;
-            color: var(--color-text-muted);
-            font-style: italic;
-        }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
 
-        /* Isi Projective */
-        .content {
-            background-color: var(--color-bg-card);
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 30px;
-        }
-        .content h2 {
-            border-bottom: 2px solid var(--color-primary);
-            padding-bottom: 10px;
-            margin-top: 40px;
-            color: var(--color-primary);
-            font-size: 1.8em;
-        }
-        .content h3 {
-            margin-top: 30px;
-            color: var(--color-text-light);
-            font-size: 1.4em;
-            border-left: 4px solid var(--color-text-muted);
-            padding-left: 10px;
-        }
-        .content h6 {
-            margin-top: 30px;
-            color: var(--color-text-light);
-            font-size: 1.4em;
-            border-left: 4px solid var(--color-text-muted);
-            padding-left: 10px;
-        }
-        
-        /* Gambar */
-        figure {
-            margin: 20px auto;
-            text-align: center;
-        }
-        figure img {
-            width: 60%;        
-            max-width: 600px;
-            height: auto;
-            border-radius: 6px;
-        }
-        figcaption {
-            font-style: italic;
-            font-size: 0.9em;
-            color: var(--color-text-muted);
-            margin-top: 10px;
-        }
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
 
-        /* Link dan Footer */
-        .page-actions {
-            margin: 20px 0;
-            text-align: right;
-        }
-        .page-actions a {
-            color: var(--color-primary);
-            text-decoration: none;
-            padding: 8px 15px;
-            border: 1px solid var(--color-primary);
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .page-actions a:hover {
-            background-color: var(--color-primary);
-            color: white;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            color: var(--color-text-muted);
-            font-size: 0.85em;
-        }
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
 
-        /* List Styling */
-        ul {
-            list-style: disc;
-            margin-left: 20px;
-        }
-        li {
-            margin-bottom: 8px;
-        }
-    </style>
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(35px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes softZoom {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .page-transition {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.08);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      color: #3f3f46;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .projective-header {
+      animation: fadeSlideUp 650ms ease both;
+    }
+
+    .projective-content {
+      animation: fadeSlideUp 850ms ease both;
+      animation-delay: 120ms;
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 30px;
+      box-shadow: 0 24px 60px rgba(120, 53, 15, 0.14);
+      padding: 30px;
+    }
+
+    .content-card h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #92400e;
+      border-bottom: 4px solid #b45309;
+      padding-bottom: 10px;
+      margin-top: 42px;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .content-card h2:first-child {
+      margin-top: 0;
+    }
+
+    .content-card h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #b45309;
+      border-left: 6px solid #b45309;
+      padding-left: 14px;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    .content-card h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #78350f;
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    .content-card p {
+      color: #27272a;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      text-align: justify;
+      margin-bottom: 16px;
+    }
+
+    .image-card {
+      margin: 24px 0;
+      padding: 16px;
+      background: #fff7ed;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 24px;
+      box-shadow: 0 16px 35px rgba(120, 53, 15, 0.10);
+      animation: softZoom 800ms ease both;
+    }
+
+    .image-frame {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #111827;
+      border: 1px solid #f3d19c;
+      box-shadow: 0 16px 35px rgba(120, 53, 15, 0.12);
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 350ms ease;
+    }
+
+    .image-frame:hover img {
+      transform: scale(1.015);
+    }
+
+    figcaption {
+      text-align: center;
+      color: #92400e;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      font-style: italic;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .content-card {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .content-card h2 {
+        font-size: 1.55rem;
+      }
+
+      .content-card h3 {
+        font-size: 1.25rem;
+      }
+
+      .content-card p {
+        font-size: 1rem;
+      }
+
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+    }
+  </style>
 </head>
-<body>
 
-    <!-- Judul Besar Halaman -->
-    <header>
-        <h1>ETNOMATEMATIKA PADA RUMAH ADAT KEPULAUAN SELAYAR</h1>
-        <p class="sub-title">Rumah Adat Selayar dibangun dengan prinsip keseimbangan, keselarasan, dan proporsi yang menggambarkan konsep geometri tradisional seperti simetri, kesebangunan, perbandingan ukuran, dan bentuk bangun ruang.</p>
-    </header>
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition min-h-screen">
 
-    <!-- Tombol Kembali di Bagian Kiri -->
-    <main class="shell">
-        <div class="page-actions">
-            <a class="back-home" href="index.html">← Kembali ke Beranda</a>
-        </div>
+<header class="projective-header sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
 
-        <projective class="content">
+    <div class="flex items-center gap-4">
+      <button 
+        id="menuBtn"
+        type="button"
+        class="pressable inline-flex h-12 w-12 items-center justify-center rounded-xl border border-amber-200 bg-white/80 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50"
+        aria-label="Buka menu"
+      >
+        <span id="menuIcon" class="text-3xl leading-none">☰</span>
+      </button>
 
-      <div class="content">
-        <!-- Introductory context -->
-        <h2>A. Projective Geometry Rumah Adat Selayar</h2>
-        <figure>
-          <img src="assets\projective_geometry\projective.png" alt="Ilustrasi teras Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi tampak depan rumah adat selayar yang menonjolkan berbagai konsep prinsip matematika, mulai dari atap yang berbentuk 
-            prisma segitiga hingga prinsip simetri pada keseluruhan desain.
-          </figcaption>
-        </figure>
-
-        <p>
-           Melalui pendekatan proyeksi ini, menunjukkan transformasi dari bentuk tiga dimensi Rumah Adat Selayar ke dalam dua dimensi tanpa
-           kehilangan hubungan antar titik, garis, dan bidangnya.  
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-zinc-900">
+          Rumah Adat Selayar
+        </h1>
+        <p class="text-xs tracking-[0.25em] text-amber-700">
+          Benteng Somba Opu
         </p>
+      </div>
+    </div>
 
-        <!-- Section: geometry concepts -->
-        <h2>B. Bentuk Geometri dalam Desain Rumah Adat Selayar</h2>
+    <img 
+      src="assets/images/logo.png" 
+      alt="Logo Lembaga"
+      class="h-12 w-12 object-contain shrink-0"
+    >
+  </div>
+</header>
 
-        <h3>1. Teras Depan</h3>
-        <!-- GAMBAR 1 -->
-        <figure>
-          <img src="assets\projective_geometry\teras_rumah(1).jpg" alt="Ilustrasi teras Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi teras Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
-          </figcaption>
-        </figure>
+<div id="menuBackdrop" class="menu-backdrop"></div>
 
-        <p>
-           Bagian depan rumah merupakan teras yang berbentuk persegi panjang dan berfungsi sebagai tempat menerima tamu sekaligus ruang 
-           transisi sebelum masuk ke bagian dalam rumah adat Selayar.  
-        </p>
-        
-        <h3>2. Ruang Tengah</h3>
-        <!-- GAMBAR 2 -->
-        <figure>
-          <img src="assets\projective_geometry\ruang_tengah(1).jpg" alt="Ilustrasi ruang tengah Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi ruang tengah Rumah Adat Selayar yang menonjolkan bentuk balok.
-          </figcaption>
-        </figure>
+<aside id="mobileMenu" class="side-menu">
+  <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+    <a href="index.html" class="menu-link">Beranda</a>
+    <a href="vtour.html" class="menu-link">Tur Virtual</a>
+    <a href="artcle.html" class="menu-link">Artikel Matematika</a>
+    <a href="projective.html" class="menu-link">Projective Geometry</a>
+    <a href="desain3d.html" class="menu-link">3D Desain</a>
+    <a href="video.html" class="menu-link">Video Drone</a>
+  </nav>
+</aside>
 
-        <p>
-           Ruang tengah merupakan ruang utama rumah yang berbentuk balok dan berfungsi 
-           sebagai tempat beraktivitas, tempat kumpul keluarga, dan mengadakan acara adat 
-           (Heston& Ayuningtyas, 2019). 
-        </p>
+<main class="projective-content max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
 
-        <h3>3. Ruang Belakang dan Dapur</h3>
-        <h4>a. Dapur Rumah</h4>
-        <!-- GAMBAR 3 -->
-        <figure>
-          <img src="assets\projective_geometry\dapur_rumah(1).jpg" alt="Ilustrasi dapur Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi dapur Rumah Adat Selayar yang menonjolkan bentuk balok dari luar.
-          </figcaption>
-        </figure>
+  <section class="max-w-4xl mx-auto text-center mb-10">
+    <p class="inline-flex items-center justify-center rounded-full border border-amber-500 px-5 py-2 text-xs sm:text-sm font-semibold tracking-[0.22em] text-amber-800 mb-5">
+      PROJECTIVE GEOMETRY
+    </p>
 
-        <p>
-           Bagian belakang rumah berfungsi sebagai dapur dan tempat menyimpan hasil panen. 
-           Ruangan ini memiliki tinggi lebih rendah daripada ruang tengah yang berbentuk balok.
-        </p>
+    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-amber-900 leading-tight mb-5">
+      Projective Geometry Rumah Adat Selayar
+    </h2>
 
-        <h4>b. Atap Dapur</h4>
-        <!-- GAMBAR 4 -->
-        <figure>
-          <img src="assets\projective_geometry\atap_dapur.JPG" alt="Ilustrasi atap dapur Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi dapur Rumah Adat Selayar yang menonjolkan struktur atap berbentuk prisma segitiga.
-          </figcaption>
-        </figure>
+    <p class="max-w-3xl mx-auto text-zinc-600 leading-7 sm:leading-8 text-justify">
+      Rumah Adat Selayar dibangun dengan prinsip keseimbangan, keselarasan, dan proporsi yang
+      menggambarkan konsep geometri tradisional seperti simetri, kesebangunan, perbandingan ukuran,
+      serta bentuk bangun ruang. Melalui pendekatan projective geometry, bentuk tiga dimensi rumah
+      dapat dipahami melalui hubungan titik, garis, bidang, dan perspektif visual.
+    </p>
+  </section>
 
-        <p>
-            Atap dapur membentuk prisma segitiga sederhana yang menyatu dengan struktur atap pelana rumah utama.
-        </p>
+  <section class="content-card max-w-5xl mx-auto">
 
-        <h3>4. Kolong Rumah</h3>
-        <h4>a. Kolong Rumah</h4>
-        <!-- GAMBAR 5 -->
-        <figure>
-          <img src="assets\projective_geometry\kolong_rumah(2).JPG" alt="Ilustrasi kolong Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi kolong Rumah Adat Selayar yang menonjolkan bentuk balok dari luar.
-          </figcaption>
-        </figure>
+    <h2>A. Projective Geometry Rumah Adat Selayar</h2>
 
-        <p>
-           Kolong rumah berbentuk balok dan berfungsi sebagai ruang sirkulasi udara dan tempat penyimpanan barang.
-        </p>
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/projective.png" alt="Projective Geometry Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi tampak depan Rumah Adat Selayar yang menonjolkan berbagai prinsip matematika,
+        mulai dari atap berbentuk prisma segitiga hingga prinsip simetri pada keseluruhan desain.
+      </figcaption>
+    </figure>
 
-        <h4>b. Tiang Penyangga</h4>
-        <!-- GAMBAR 6 -->
-        <figure>
-          <img src="assets\projective_geometry\tiang_rumah(1).jpg" alt="Ilustrasi tiang penyangga Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi tiang penyangga Rumah Adat Selayar yang menonjolkan bentuk balok.
-          </figcaption>
-        </figure>
+    <p>
+      Melalui pendekatan proyeksi ini, bentuk tiga dimensi Rumah Adat Selayar dapat ditransformasikan
+      ke dalam bidang dua dimensi tanpa menghilangkan hubungan antar titik, garis, dan bidangnya.
+      Dengan demikian, pengunjung dapat memahami bagaimana struktur arsitektur tradisional dapat
+      dibaca melalui prinsip geometri dan perspektif.
+    </p>
 
-        <p>
-            Tiang-tiang yang disusun membentuk susunan balok yang menjadi struktur dasar rumah.
-        </p>
+    <h2>B. Bentuk Geometri dalam Desain Rumah Adat Selayar</h2>
 
-        <h4>c. Alas Tiang</h4>
-        <!-- GAMBAR 7 -->
-        <figure>
-          <img src="assets\projective_geometry\alas_tiang(2).JPG" alt="Ilustrasi alas tiang Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi alas tiang Rumah Adat Selayar yang menonjolkan struktur atap berbentuk prisma segitiga.
-          </figcaption>
-        </figure>
+    <h3>1. Teras Depan</h3>
 
-        <p>
-            Tiang rumah berdiri di atas batu penopang berbentuk prisma trapesium yang dirancang agar berat rumah tersebar 
-            merata ke tanah.
-        </p>
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/teras_rumah(1).jpg" alt="Ilustrasi teras Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi teras Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
+      </figcaption>
+    </figure>
 
-        <h3>5. Atap Pelana</h3>
-        <!-- GAMBAR 8 -->
-        <figure>
-          <img src="assets\projective_geometry\atap_rumah.JPG" alt="Ilustrasi atap Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi atap Rumah Adat Selayar yang menonjolkan struktur atap berbentuk prisma segitiga.
-          </figcaption>
-        </figure>
+    <p>
+      Bagian depan rumah merupakan teras yang berbentuk persegi panjang dan berfungsi sebagai
+      tempat menerima tamu sekaligus ruang transisi sebelum masuk ke bagian dalam Rumah Adat Selayar.
+      Secara geometris, bentuk persegi panjang pada teras memperlihatkan keteraturan ukuran dan
+      pemanfaatan ruang yang efisien.
+    </p>
 
-        <p>
-           Atap rumah berbentuk prisma segitiga dan menggunakan bahan dasar bambu (rumbia) (Opu, 2024).
-           Bentuk ini digunakan agar aliran air hujan mengalir ke bawah, sehingga tidak merembes ke dalam 
-           rumah (Rahmansah & Rauf, 2014).
-        </p>
+    <h3>2. Ruang Tengah</h3>
 
-        <h3>6. Jendela Rumah</h3>
-        <!-- GAMBAR 9 -->
-        <figure>
-          <img src="assets\projective_geometry\jendela_rumah(1).png" alt="Ilustrasi jendela Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi jendela Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
-          </figcaption>
-        </figure>
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/ruang_tengah(1).jpg" alt="Ilustrasi ruang tengah Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi ruang tengah Rumah Adat Selayar yang menonjolkan bentuk balok.
+      </figcaption>
+    </figure>
 
-        <p>
-           Pada umumnya, jendela berbentuk persegi panjang vertikal dengan rasio antara tinggi dan lebar 
-           jendela biasanya sekitar 2 : 1.
-        </p>
+    <p>
+      Ruang tengah merupakan ruang utama rumah yang dapat dimodelkan sebagai bentuk balok. Ruangan
+      ini berfungsi sebagai tempat beraktivitas, berkumpul bersama keluarga, dan mengadakan acara adat.
+      Dalam kajian geometri, ruang tengah memperlihatkan konsep panjang, lebar, tinggi, volume, dan
+      proporsi ruang.
+    </p>
 
-        <h3>7. Pintu Rumah</h3>
-        <!-- GAMBAR 10 -->
-        <figure>
-          <img src="assets\projective_geometry\pintu_rumah (1).jpg" alt="Ilustrasi pintu Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi pintu Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
-          </figcaption>
-        </figure>
+    <h3>3. Ruang Belakang dan Dapur</h3>
 
-        <p>
-           Bentuk pintu pada Rumah Adat Selayar sama dengan bentuk jendela, yaitu persegi panjang vertikal.
-           Tinggi pintu umumnya sekitar 2 kali lebar pintu atau dapat dituliskan rasio 2 : 1.
-        </p>
+    <h4>a. Dapur Rumah</h4>
 
-        <h3>8. Tangga</h3>
-        <h4>a. Anak Tangga</h4>
-        <!-- GAMBAR 11 -->
-        <figure>
-          <img src="assets\projective_geometry\anak_tangga(1).jpg" alt="Ilustrasi anak tangga Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi anak tangga Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
-          </figcaption>
-        </figure>
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/dapur_rumah(1).jpg" alt="Ilustrasi dapur Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi dapur Rumah Adat Selayar yang menonjolkan bentuk balok dari luar.
+      </figcaption>
+    </figure>
 
-        <p>
-           Tangga rumah adat Selayar tersusun dari papan-papan kayu yang berbentuk persegi panjang (anak tangga).
-        </p>
+    <p>
+      Bagian belakang rumah berfungsi sebagai dapur dan tempat menyimpan hasil panen. Ruangan ini
+      memiliki tinggi yang lebih rendah daripada ruang tengah dan dapat dimodelkan sebagai bentuk
+      balok. Perbedaan ukuran antara ruang tengah dan dapur menunjukkan adanya konsep perbandingan
+      dan skala.
+    </p>
 
-        <h4>b. Sisi Miring Tangga</h4>
-        <!-- GAMBAR 12 -->
-        <figure>
-          <img src="assets\projective_geometry\kemiringan_tangga(1).jpg" alt="Ilustrasi sisi miring tangga Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi tangga Rumah Adat Selayar yang menonjolkan kemiringan tangga bentuk segitiga siku-siku apabila dilihat dari samping.
-          </figcaption>
-        </figure>
+    <h4>b. Atap Dapur</h4>
 
-        <p>
-            Apabila dilihat dari samping, maka struktur tangga membentuk segitiga siku-siku.
-        </p>
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/atap_dapur.JPG" alt="Ilustrasi atap dapur Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi dapur Rumah Adat Selayar yang menonjolkan struktur atap berbentuk prisma segitiga.
+      </figcaption>
+    </figure>
 
-        <h4>c. Pegangan Tangga</h4>
-        <!-- GAMBAR 13 -->
-        <figure>
-          <img src="assets\projective_geometry\pengangan_tangga(1).jpg" alt="Ilustrasi pegangan tangga Rumah Adat Selayar" />
-          <figcaption>
-            Visualisasi pegangan tangga Rumah Adat Selayar yang menonjolkan simetri dan pola translasi.
-          </figcaption>
-        </figure>
+    <p>
+      Atap dapur membentuk prisma segitiga sederhana yang menyatu dengan struktur atap pelana rumah
+      utama. Bentuk ini dapat dikaji melalui konsep segitiga, bidang miring, volume prisma, dan
+      kesesuaian bentuk atap terhadap fungsi aliran air hujan.
+    </p>
 
-        <p>
-            Tiang pegangan tangga yang berada di sisi kanan dan kiri tersusun sejajar yang menunjukkan simetri 
-            dan pola repetitif (translasi).
-        </p>
-    </section>
+    <h3>4. Kolong Rumah</h3>
+
+    <h4>a. Kolong Rumah</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/kolong_rumah(2).JPG" alt="Ilustrasi kolong Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi kolong Rumah Adat Selayar yang menonjolkan bentuk balok dari luar.
+      </figcaption>
+    </figure>
+
+    <p>
+      Kolong rumah berbentuk balok dan berfungsi sebagai ruang sirkulasi udara serta tempat
+      penyimpanan barang. Pada rumah panggung, kolong juga menjadi bagian penting yang menyesuaikan
+      bangunan dengan kondisi lingkungan. Secara matematis, kolong dapat dianalisis melalui konsep
+      volume, tinggi ruang, dan perbandingan ukuran.
+    </p>
+
+    <h4>b. Tiang Penyangga</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/tiang_rumah(1).jpg" alt="Ilustrasi tiang penyangga Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi tiang penyangga Rumah Adat Selayar yang menonjolkan bentuk balok.
+      </figcaption>
+    </figure>
+
+    <p>
+      Tiang-tiang yang disusun pada bagian bawah rumah membentuk struktur balok yang menjadi dasar
+      kekuatan bangunan. Susunan tiang tersebut menunjukkan pola pengulangan, kesejajaran, dan
+      simetri. Dalam geometri, elemen ini dapat dikaji melalui konsep balok, garis vertikal, jarak
+      antar titik, dan distribusi beban.
+    </p>
+
+    <h4>c. Alas Tiang</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/alas_tiang(2).JPG" alt="Ilustrasi alas tiang Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi alas tiang Rumah Adat Selayar yang menonjolkan bentuk prisma trapesium.
+      </figcaption>
+    </figure>
+
+    <p>
+      Tiang rumah berdiri di atas batu penopang yang dapat dimodelkan sebagai prisma trapesium.
+      Bentuk ini dirancang agar berat rumah tersebar merata ke tanah. Secara matematis, alas tiang
+      dapat dianalisis melalui konsep trapesium, luas alas, volume prisma, dan kestabilan struktur.
+    </p>
+
+    <h3>5. Atap Pelana</h3>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/atap_rumah.JPG" alt="Ilustrasi atap Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi atap Rumah Adat Selayar yang menonjolkan struktur atap berbentuk prisma segitiga.
+      </figcaption>
+    </figure>
+
+    <p>
+      Atap rumah berbentuk prisma segitiga dan menggunakan bahan dasar bambu atau rumbia. Bentuk ini
+      digunakan agar aliran air hujan dapat mengalir ke bawah sehingga tidak merembes ke dalam rumah.
+      Pada sudut pandang projective geometry, atap pelana memperlihatkan garis miring, bidang segitiga,
+      dan hubungan perspektif antara bagian depan, belakang, serta sisi samping atap.
+    </p>
+
+    <h3>6. Jendela Rumah</h3>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/jendela_rumah(1).png" alt="Ilustrasi jendela Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi jendela Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
+      </figcaption>
+    </figure>
+
+    <p>
+      Pada umumnya, jendela berbentuk persegi panjang vertikal dengan rasio antara tinggi dan lebar
+      sekitar 2 : 1. Bentuk jendela ini dapat dikaji melalui konsep persegi panjang, perbandingan,
+      skala, dan kesebangunan.
+    </p>
+
+    <h3>7. Pintu Rumah</h3>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/pintu_rumah (1).jpg" alt="Ilustrasi pintu Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi pintu Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
+      </figcaption>
+    </figure>
+
+    <p>
+      Bentuk pintu pada Rumah Adat Selayar sama dengan bentuk jendela, yaitu persegi panjang vertikal.
+      Tinggi pintu umumnya sekitar dua kali lebar pintu atau dapat dituliskan dengan rasio 2 : 1.
+      Kesamaan bentuk antara pintu dan jendela menunjukkan konsep kesebangunan.
+    </p>
+
+    <h3>8. Tangga</h3>
+
+    <h4>a. Anak Tangga</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/anak_tangga(1).jpg" alt="Ilustrasi anak tangga Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi anak tangga Rumah Adat Selayar yang menonjolkan bentuk persegi panjang.
+      </figcaption>
+    </figure>
+
+    <p>
+      Tangga Rumah Adat Selayar tersusun dari papan-papan kayu yang berbentuk persegi panjang.
+      Susunan anak tangga menunjukkan pola berulang, jarak yang relatif teratur, dan konsep
+      perbandingan ukuran.
+    </p>
+
+    <h4>b. Sisi Miring Tangga</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/kemiringan_tangga(1).jpg" alt="Ilustrasi sisi miring tangga Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi tangga Rumah Adat Selayar yang menonjolkan kemiringan tangga berbentuk segitiga siku-siku apabila dilihat dari samping.
+      </figcaption>
+    </figure>
+
+    <p>
+      Apabila dilihat dari samping, struktur tangga membentuk segitiga siku-siku. Bentuk ini dapat
+      dikaji melalui konsep tinggi, alas, sisi miring, sudut kemiringan, dan perbandingan panjang.
+    </p>
+
+    <h4>c. Pegangan Tangga</h4>
+
+    <figure class="image-card">
+      <div class="image-frame">
+        <img src="assets/projective_geometry/pengangan_tangga(1).jpg" alt="Ilustrasi pegangan tangga Rumah Adat Selayar">
+      </div>
+      <figcaption>
+        Visualisasi pegangan tangga Rumah Adat Selayar yang menonjolkan simetri dan pola translasi.
+      </figcaption>
+    </figure>
+
+    <p>
+      Tiang pegangan tangga yang berada di sisi kanan dan kiri tersusun sejajar. Susunan ini
+      menunjukkan konsep simetri, kesejajaran, dan pola translasi. Dalam konteks visual, pegangan
+      tangga juga memperlihatkan hubungan garis-garis sejajar yang dapat diamati melalui perspektif
+      proyektif.
+    </p>
+
+  </section>
+
+  <div class="max-w-5xl mx-auto mt-8 flex justify-center">
+    <a href="index.html"
+       class="pressable inline-flex items-center justify-center rounded-xl bg-amber-700 px-7 py-3.5 text-sm sm:text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition duration-300 hover:bg-amber-800 hover:-translate-y-0.5">
+      ← Kembali ke Beranda
+    </a>
+  </div>
+
+</main>
+
+<footer class="mt-20 bg-zinc-900 text-zinc-300">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+    <p>© 2025 · Projective Geometry Rumah Adat Selayar</p>
+
+    <p>
+      <a 
+        href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/" 
+        target="_blank"
+        class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+      >
+        Benteng Somba Opu
+      </a>
+    </p>
+  </div>
+</footer>
+
+<div id="pageOverlay" class="page-overlay"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  const overlay = document.getElementById("pageOverlay");
+
+  const menuBtn = document.getElementById("menuBtn");
+  const menuIcon = document.getElementById("menuIcon");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const menuBackdrop = document.getElementById("menuBackdrop");
+
+  if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+    menuBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      mobileMenu.classList.toggle("open");
+      menuBackdrop.classList.toggle("open");
+      body.classList.toggle("menu-open");
+
+      menuIcon.textContent = mobileMenu.classList.contains("open") ? "×" : "☰";
+    });
+
+    menuBackdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      menuBackdrop.classList.remove("open");
+      body.classList.remove("menu-open");
+      menuIcon.textContent = "☰";
+    });
+  }
+
+  const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+  links.forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+
+      if (!href || href.startsWith("javascript:")) return;
+
+      e.preventDefault();
+
+      body.classList.add("is-leaving");
+      if (overlay) overlay.classList.add("is-active");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 420);
+    });
+  });
+
+  window.addEventListener("pageshow", () => {
+    body.classList.remove("is-leaving");
+    body.classList.remove("menu-open");
+    if (overlay) overlay.classList.remove("is-active");
+  });
+});
+</script>
+
 </body>
 </html>

@@ -1,280 +1,495 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Model Rumah Adat Selayar</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script
-      type="module"
-      src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
-    ></script>
+  <title>3D Model Rumah Adat Selayar</title>
 
-    <style>
-      /* --- GLOBAL STYLES --- */
-      body {
-        background-color: #0d1117;
-        color: #e5e5e5;
-        font-family: "Poppins", sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        position: relative;
+  <script
+    type="module"
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+  ></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
       }
 
-      /* --- TOMBOL KEMBALI --- */
-      .back-button {
-        position: absolute;
-        top: 20px;
-        left: 25px;
-        background-color: #00c8ff;
-        color: #0d1117;
-        border: none;
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0, 200, 255, 0.3);
-        z-index: 10;
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
       }
 
-      .back-button:hover {
-        background-color: #008cbf;
-        transform: translateY(-2px);
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(35px);
       }
 
-      h1 {
-        font-size: 1.8rem;
-        color: #00c8ff;
-        margin-top: 80px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #00c8ff;
-        padding-bottom: 8px;
-        letter-spacing: 1px;
-        text-align: center;
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-transition {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.08);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      color: #3f3f46;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .model-header {
+      animation: fadeSlideUp 650ms ease both;
+    }
+
+    .model-content {
+      animation: fadeSlideUp 850ms ease both;
+      animation-delay: 120ms;
+    }
+
+    .model-card {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 30px;
+      box-shadow: 0 24px 60px rgba(120, 53, 15, 0.16);
+      padding: 18px;
+    }
+
+    .model-frame {
+      width: 100%;
+      height: 520px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #111827;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 18px 45px rgba(120, 53, 15, 0.18);
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      background: #111827;
+      --poster-color: #111827;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 22px;
+      background: rgba(254, 243, 199, 0.8);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .control-group span {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #78350f;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+
+    .btn-ctrl {
+      min-width: 46px;
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(180, 83, 9, 0.45);
+      background: #b45309;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 220ms ease;
+      box-shadow: 0 10px 22px rgba(120, 53, 15, 0.12);
+    }
+
+    .btn-ctrl:hover {
+      background: #92400e;
+      transform: translateY(-2px);
+    }
+
+    .btn-reset {
+      background: #7f1d1d;
+      border-color: #7f1d1d;
+    }
+
+    .btn-reset:hover {
+      background: #991b1b;
+    }
+
+    @media (max-width: 768px) {
+      .model-frame {
+        height: 430px;
+        border-radius: 20px;
       }
 
-      /* --- CONTAINER MODEL --- */
-      .model-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #161b22;
-        border-radius: 12px;
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
-        padding: 10px;
-        margin-bottom: 25px;
-        width: 90%;
-        max-width: 700px;
-        border: 1px solid #30363d;
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .model-frame {
+        height: 360px;
       }
 
-      .model-container {
-        width: 100%;
-        height: 400px;
-        position: relative;
-      }
-
-      model-viewer {
-        width: 100%;
-        height: 100%;
-        border-radius: 10px;
-        background-color: #0d1117;
-        --poster-color: #0d1117;
-      }
-
-      /* --- PANEL KONTROL TOMBOL --- */
       .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 15px;
-        padding: 10px;
-        background-color: #21262d;
-        border-radius: 8px;
-        width: 100%;
-        box-sizing: border-box;
+        padding: 12px;
       }
+    }
+  </style>
+</head>
 
-      .control-group {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-      }
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition min-h-screen">
 
-      .control-group span {
-        font-size: 0.8rem;
-        color: #8b949e;
-        margin-right: 5px;
-        font-weight: bold;
-        text-transform: uppercase;
-      }
+<header class="model-header sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
 
-      .btn-ctrl {
-        background-color: #30363d;
-        border: 1px solid #6e7681;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-      }
+    <div class="flex items-center gap-4">
+      <button 
+        id="menuBtn"
+        type="button"
+        class="pressable inline-flex h-12 w-12 items-center justify-center rounded-xl border border-amber-200 bg-white/80 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50"
+        aria-label="Buka menu"
+      >
+        <span id="menuIcon" class="text-3xl leading-none">☰</span>
+      </button>
 
-      .btn-ctrl:hover {
-        background-color: #00c8ff;
-        color: #000;
-        border-color: #00c8ff;
-      }
-
-      .btn-ctrl:active {
-        transform: scale(0.95);
-      }
-
-      /* --- TEXT & FOOTER --- */
-      .description-text {
-        width: 90%;
-        max-width: 700px;
-        text-align: justify;
-        line-height: 1.7;
-        color: #cfcfcf;
-        margin-bottom: 60px;
-      }
-
-      footer {
-        font-size: 0.85rem;
-        color: #888;
-        text-align: center;
-        padding: 15px;
-        width: 100%;
-        background-color: #0d1117;
-        position: fixed;
-        bottom: 0;
-        z-index: 100;
-      }
-
-      @media (max-height: 700px) {
-        footer {
-          position: relative;
-        }
-        body {
-          padding-bottom: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <a href="index.html" class="back-button">← Kembali</a>
-
-    <h1>3D Model Rumah Adat Selayar</h1>
-
-    <div class="model-wrapper">
-      <div class="model-container">
-        <model-viewer
-          id="boyang-viewer"
-          src="assets\desain_3d\Rumah Adat Selayar - Copy.glb"
-          alt="Model 3D Rumah Adat Selayar"
-          camera-controls
-          auto-rotate
-          shadow-intensity="1"
-          exposure="1.0"
-          ar
-          interpolation-decay="200"
-          min-camera-orbit="auto auto 5%"
-          max-camera-orbit="auto auto 100%"
-        >
-        </model-viewer>
-      </div>
-
-      <div class="controls">
-        <div class="control-group">
-          <span>Zoom:</span>
-          <button class="btn-ctrl" onclick="ubahZoom(-10)" title="Zoom Out">
-            ➖
-          </button>
-          <button class="btn-ctrl" onclick="ubahZoom(10)" title="Zoom In">
-            ➕
-          </button>
-        </div>
-
-        <div class="control-group">
-          <span>Putar:</span>
-          <button
-            class="btn-ctrl"
-            onclick="putarKamera(-30)"
-            title="Putar Kiri"
-          >
-            ↺
-          </button>
-          <button
-            class="btn-ctrl"
-            onclick="putarKamera(30)"
-            title="Putar Kanan"
-          >
-            ↻
-          </button>
-        </div>
-
-        <div class="control-group">
-          <button
-            class="btn-ctrl"
-            onclick="resetKamera()"
-            title="Reset Posisi"
-            style="background-color: #da3633; border-color: #da3633"
-          >
-            Reset
-          </button>
-        </div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-zinc-900">
+          Rumah Adat Selayar
+        </h1>
+        <p class="text-xs tracking-[0.25em] text-amber-700">
+          Benteng Somba Opu
+        </p>
       </div>
     </div>
 
-    <p class="description-text">
-      Rumah Adat Selayar merupakan rumah tradisional khas wilayah pulau Selayar,
-      Sulawesi Selatan, yang berkaitan erat dengan budaya Selayar.
-      Rumah ini berbentuk panggung dengan struktur kayu, memiliki sirkulasi udara
-      yang baik, dan dirancang sesuai dengan kondisi lingkungan tropis.
-      <br /><br />
-      Melalui model 3D ini, pengguna dapat mengamati bentuk arsitektur rumah adat
-      secara visual dari berbagai sudut pandang untuk memahami struktur dan nilai
-      budaya yang terkandung di dalamnya.
+    <img 
+      src="assets/images/logo.png" 
+      alt="Logo Lembaga"
+      class="h-12 w-12 object-contain shrink-0"
+    >
+  </div>
+</header>
+
+<div id="menuBackdrop" class="menu-backdrop"></div>
+
+<aside id="mobileMenu" class="side-menu">
+  <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+    <a href="index.html" class="menu-link">Beranda</a>
+    <a href="vtour.html" class="menu-link">Tur Virtual</a>
+    <a href="artcle.html" class="menu-link">Artikel Matematika</a>
+    <a href="projective.html" class="menu-link">Projective Geometry</a>
+    <a href="desain3d.html" class="menu-link">3D Desain</a>
+    <a href="video.html" class="menu-link">Video Drone</a>
+  </nav>
+</aside>
+
+<main class="model-content max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+  <section class="max-w-4xl mx-auto text-center mb-8">
+    <p class="inline-flex items-center justify-center rounded-full border border-amber-500 px-5 py-2 text-xs sm:text-sm font-semibold tracking-[0.22em] text-amber-800 mb-5">
+      MODEL 3D
     </p>
 
-    <footer>© 2025 Etnomatematika Rumah Adat Selayar · Tim Pengembang</footer>
+    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-amber-900 leading-tight mb-5">
+      3D Model Rumah Adat Selayar
+    </h2>
 
-    <script>
-      const model = document.querySelector("#model");
+    <p class="max-w-3xl mx-auto text-zinc-600 leading-7 sm:leading-8 text-justify">
+      Halaman ini menampilkan model 3D Rumah Adat Selayar sebagai media visual untuk memahami
+      bentuk arsitektur rumah panggung, struktur kayu, proporsi bangunan, dan nilai budaya
+      masyarakat Selayar. Pengguna dapat memperbesar, memperkecil, memutar, dan mengatur ulang
+      tampilan model untuk mengamati detail bangunan dari berbagai sudut pandang.
+    </p>
+  </section>
 
-      function putarKamera(deg) {
-        const o = model.getCameraOrbit();
-        model.cameraOrbit = `${o.theta + (deg * Math.PI) / 180}rad ${o.phi}rad ${o.radius}m`;
-      }
+  <section class="model-card max-w-5xl mx-auto">
+    <div class="model-frame">
+      <model-viewer
+        id="model"
+        src="assets/desain_3d/Rumah Adat Selayar - Copy.glb"
+        alt="Model 3D Rumah Adat Selayar"
+        camera-controls
+        auto-rotate
+        shadow-intensity="1"
+        exposure="1.0"
+        ar
+        interpolation-decay="200"
+        min-camera-orbit="auto auto 5%"
+        max-camera-orbit="auto auto 100%"
+      >
+      </model-viewer>
+    </div>
 
-      function ubahZoom(step) {
-        let fov = model.getFieldOfView() - step;
+    <div class="controls">
+      <div class="control-group">
+        <span>Zoom</span>
+        <button class="btn-ctrl" onclick="ubahZoom(-10)" title="Zoom Out">➖</button>
+        <button class="btn-ctrl" onclick="ubahZoom(10)" title="Zoom In">➕</button>
+      </div>
 
-        // ZOOM DIPERBESAR
-        if (fov < 5) fov = 5;
-        if (fov > 70) fov = 70;
+      <div class="control-group">
+        <span>Putar</span>
+        <button class="btn-ctrl" onclick="putarKamera(-30)" title="Putar Kiri">↺</button>
+        <button class="btn-ctrl" onclick="putarKamera(30)" title="Putar Kanan">↻</button>
+      </div>
 
-        model.fieldOfView = `${fov}deg`;
-      }
+      <div class="control-group">
+        <button class="btn-ctrl btn-reset" onclick="resetKamera()" title="Reset Posisi">
+          Reset
+        </button>
+      </div>
+    </div>
+  </section>
 
-      function resetKamera() {
-        model.cameraOrbit = "auto auto auto";
-        model.cameraTarget = "auto auto auto";
-        model.fieldOfView = "auto";
-      }
-    </script>
-  </body>
+  <section class="max-w-4xl mx-auto mt-8 rounded-[30px] border border-amber-100 bg-white p-8 shadow-sm">
+    <p class="text-sm uppercase tracking-[0.2em] text-amber-700 mb-3">
+      Deskripsi Model
+    </p>
+
+    <h3 class="text-3xl sm:text-4xl font-bold text-zinc-900 mb-5 leading-tight">
+      Visualisasi Arsitektur Rumah Adat Selayar
+    </h3>
+
+    <p class="text-zinc-600 leading-7 sm:leading-8 mb-5 text-justify">
+      Rumah Adat Selayar merupakan rumah tradisional khas wilayah Kepulauan Selayar,
+      Sulawesi Selatan, yang berkaitan erat dengan budaya masyarakat maritim. Rumah ini
+      berbentuk panggung dengan struktur kayu, memiliki sirkulasi udara yang baik, dan
+      dirancang sesuai dengan kondisi lingkungan tropis.
+    </p>
+
+    <p class="text-zinc-600 leading-7 sm:leading-8 text-justify">
+      Melalui model 3D ini, pengguna dapat mengamati bentuk arsitektur rumah adat secara
+      visual dari berbagai sudut pandang untuk memahami struktur, proporsi, detail konstruksi,
+      dan nilai budaya yang terkandung di dalamnya.
+    </p>
+  </section>
+
+  <div class="max-w-5xl mx-auto mt-8 flex justify-center">
+    <a href="index.html"
+       class="pressable inline-flex items-center justify-center rounded-xl bg-amber-700 px-7 py-3.5 text-sm sm:text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition duration-300 hover:bg-amber-800 hover:-translate-y-0.5">
+      ← Kembali ke Beranda
+    </a>
+  </div>
+
+</main>
+
+<footer class="mt-20 bg-zinc-900 text-zinc-300">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+    <p>© 2025 · Etnomatematika Rumah Adat Selayar</p>
+
+    <p>
+      <a 
+        href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/" 
+        target="_blank"
+        class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+      >
+        Benteng Somba Opu
+      </a>
+    </p>
+  </div>
+</footer>
+
+<div id="pageOverlay" class="page-overlay"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  const overlay = document.getElementById("pageOverlay");
+
+  const menuBtn = document.getElementById("menuBtn");
+  const menuIcon = document.getElementById("menuIcon");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const menuBackdrop = document.getElementById("menuBackdrop");
+
+  if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+    menuBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      mobileMenu.classList.toggle("open");
+      menuBackdrop.classList.toggle("open");
+      body.classList.toggle("menu-open");
+
+      menuIcon.textContent = mobileMenu.classList.contains("open") ? "×" : "☰";
+    });
+
+    menuBackdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      menuBackdrop.classList.remove("open");
+      body.classList.remove("menu-open");
+      menuIcon.textContent = "☰";
+    });
+  }
+
+  const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+  links.forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+
+      if (!href || href.startsWith("javascript:")) return;
+
+      e.preventDefault();
+
+      body.classList.add("is-leaving");
+      if (overlay) overlay.classList.add("is-active");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 420);
+    });
+  });
+
+  window.addEventListener("pageshow", () => {
+    body.classList.remove("is-leaving");
+    body.classList.remove("menu-open");
+    if (overlay) overlay.classList.remove("is-active");
+  });
+});
+
+const model = document.querySelector("#model");
+
+function putarKamera(deg) {
+  if (!model) return;
+
+  const orbit = model.getCameraOrbit();
+  model.cameraOrbit = `${orbit.theta + (deg * Math.PI) / 180}rad ${orbit.phi}rad ${orbit.radius}m`;
+}
+
+function ubahZoom(step) {
+  if (!model) return;
+
+  let fov = model.getFieldOfView() - step;
+
+  if (fov < 5) fov = 5;
+  if (fov > 70) fov = 70;
+
+  model.fieldOfView = `${fov}deg`;
+}
+
+function resetKamera() {
+  if (!model) return;
+
+  model.cameraOrbit = "auto auto auto";
+  model.cameraTarget = "auto auto auto";
+  model.fieldOfView = "auto";
+}
+</script>
+
+</body>
 </html>

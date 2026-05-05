@@ -1,422 +1,853 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannellum Tour 0–13 (no loops)</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
-    <link rel="stylesheet" href="css/vtour.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tur Virtual Rumah Adat Kepulauan Kabupaten Selayar</title>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(35px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-transition {
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.08);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      color: #3f3f46;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .vtour-header {
+      animation: fadeSlideUp 650ms ease both;
+    }
+
+    .vtour-wrapper {
+      animation: fadeSlideUp 850ms ease both;
+      animation-delay: 120ms;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(120, 53, 15, 0.10);
+      margin-bottom: 18px;
+    }
+
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #78350f;
+      text-align: center;
+    }
+
+    .top-bar__actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .go-home,
+    .minimap-btn {
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      background: #b45309;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: 250ms ease;
+      box-shadow: 0 12px 25px rgba(120, 53, 15, 0.16);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .go-home:hover,
+    .minimap-btn:hover {
+      background: #92400e;
+      transform: translateY(-2px);
+    }
+
+    #panorama {
+      width: 100%;
+      height: calc(100vh - 225px);
+      min-height: 520px;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 24px 60px rgba(120, 53, 15, 0.18);
+      background: #111827;
+      position: relative;
+    }
+
+    .scenes {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 22px;
+      box-shadow: 0 14px 35px rgba(120, 53, 15, 0.08);
+    }
+
+    .scenes button {
+      min-width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #fef3c7;
+      color: #78350f;
+      font-weight: 800;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      transition: 220ms ease;
+      cursor: pointer;
+      padding: 0 12px;
+    }
+
+    .scenes button:hover {
+      background: #b45309;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .minimap-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(24, 24, 27, 0.72);
+      z-index: 9998;
+      padding: 24px;
+    }
+
+    .minimap-modal.active {
+      display: flex;
+    }
+
+    .minimap-img {
+      max-width: min(95vw, 900px);
+      max-height: 90vh;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      border: 4px solid #f7f1e8;
+    }
+
+    .coord-hint {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      z-index: 20;
+      background: rgba(24, 24, 27, 0.78);
+      color: white;
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      font-family: monospace;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        justify-content: center;
+        text-align: center;
+      }
+
+      #panorama {
+        height: calc(100vh - 285px);
+        min-height: 420px;
+        border-radius: 22px;
+      }
+
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
-<body>
-<div class="top-bar">
-    <a href="index.html" class="go-home">← Kembali ke Beranda</a>
-    <h3 class="page-title">Tur Virtual Rumah Adat Kepulauan Kabupaten Selayar</h3>
+
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition">
+
+<header class="vtour-header sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+
+    <div class="flex items-center gap-4">
+      <button 
+        id="menuBtn"
+        type="button"
+        class="pressable inline-flex h-12 w-12 items-center justify-center rounded-xl border border-amber-200 bg-white/80 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50"
+        aria-label="Buka menu"
+      >
+        <span id="menuIcon" class="text-3xl leading-none">☰</span>
+      </button>
+
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-zinc-900">
+          Rumah Adat Selayar
+        </h1>
+        <p class="text-xs tracking-[0.25em] text-amber-700">
+          Benteng Somba Opu
+        </p>
+      </div>
+    </div>
+
+    <img 
+      src="assets/images/logo.png" 
+      alt="Logo Lembaga"
+      class="h-12 w-12 object-contain shrink-0"
+    >
+  </div>
+</header>
+
+<div id="menuBackdrop" class="menu-backdrop"></div>
+
+<aside id="mobileMenu" class="side-menu">
+  <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+    <a href="index.html" class="menu-link">Beranda</a>
+    <a href="vtour.html" class="menu-link">Tur Virtual</a>
+    <a href="artcle.html" class="menu-link">Artikel Matematika</a>
+    <a href="projective.html" class="menu-link">Projective Geometry</a>
+    <a href="desain3d.html" class="menu-link">3D Desain</a>
+    <a href="video.html" class="menu-link">Video Drone</a>
+  </nav>
+</aside>
+
+<main class="vtour-wrapper max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6">
+
+  <div class="top-bar">
+    <a href="index.html" class="go-home pressable">← Kembali ke Beranda</a>
+
+    <h3 class="page-title">Tur Virtual Rumah Adat Kepulauan Kabupaten Selayar (Scenes 0 → 13)</h3>
+
     <div class="top-bar__actions">
-      <button class="minimap-btn" onclick="showMinimap()">Tampilkan Minimap</button>
-      <button id="toggleDragBtn" class="minimap-btn">Nonaktifkan Drag</button>
+      <button class="minimap-btn pressable" onclick="showMinimap()">Tampilkan Minimap</button>
+      <button id="toggleDragBtn" class="minimap-btn pressable">Nonaktifkan Drag</button>
     </div>
   </div>
 
-  <!-- Modal Minimap -->
+  <div id="panorama"></div>
+
+  <div class="scenes">
+    <button onclick="viewer.loadScene('s0')">0</button>
+    <button onclick="viewer.loadScene('s1')">1</button>
+    <button onclick="viewer.loadScene('s2')">2</button>
+    <button onclick="viewer.loadScene('s3')">3</button>
+    <button onclick="viewer.loadScene('s4')">4</button>
+    <button onclick="viewer.loadScene('s5')">5</button>
+    <button onclick="viewer.loadScene('s6')">6</button>
+    <button onclick="viewer.loadScene('s7')">7</button>
+    <button onclick="viewer.loadScene('s8')">8</button>
+    <button onclick="viewer.loadScene('s9')">9</button>
+    <button onclick="viewer.loadScene('s10')">10</button>
+    <button onclick="viewer.loadScene('s11')">11</button>
+    <button onclick="viewer.loadScene('s12')">12</button>
+    <button onclick="viewer.loadScene('s13')">13</button>
+  </div>
+
+</main>
+
 <div id="minimapModal" class="minimap-modal" onclick="hideMinimap()">
-  <img src="assets/images/minimap_rumah.jpg" alt="Minimap Virtual Tour" class="minimap-img">
+  <img src="assets/images/minimap_rumah.jpg" alt="Minimap Tur Virtual Rumah Adat Selayar" class="minimap-img">
 </div>
 
-<h3>Pannellum Virtual Tour (Scenes 0 → 13)</h3>
-<div id="panorama"></div>
-<div class="scenes">
-  <!-- Static scene buttons without any loop -->
-  <button onclick="viewer.loadScene('s0')">0</button>
-  <button onclick="viewer.loadScene('s1')">1</button>
-  <button onclick="viewer.loadScene('s2')">2</button>
-  <button onclick="viewer.loadScene('s3')">3</button>
-  <button onclick="viewer.loadScene('s4')">4</button>
-  <button onclick="viewer.loadScene('s5')">5</button>
-  <button onclick="viewer.loadScene('s6')">6</button>
-  <button onclick="viewer.loadScene('s7')">7</button>
-  <button onclick="viewer.loadScene('s8')">8</button>
-  <button onclick="viewer.loadScene('s9')">9</button>
-  <button onclick="viewer.loadScene('s10')">10</button>
-  <button onclick="viewer.loadScene('s11')">11</button>
-  <button onclick="viewer.loadScene('s12')">12</button>
-  <button onclick="viewer.loadScene('s13')">13</button>
-</div>
+<footer class="mt-20 bg-zinc-900 text-zinc-300">
+  <div class="footer-container max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+    <p>© 2025 · Tur Virtual Rumah Adat Kepulauan Kabupaten Selayar</p>
+
+    <p>
+      <a 
+        href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/" 
+        target="_blank"
+        class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+      >
+        Benteng Somba Opu
+      </a>
+    </p>
+  </div>
+</footer>
+
+<div id="pageOverlay" class="page-overlay"></div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  const overlay = document.getElementById("pageOverlay");
 
-  /*
-    // === Generator otomatis hotspot ===
-    // const LAST_SCENE_INDEX = 13;
-    // const scenes = {};
-    // for (let i = 0; i <= LAST_SCENE_INDEX; i += 1) {
-    //   const sceneId = `s${i}`;
-    //   const entry = {
-    //     title: `Spot ${i}`,
-    //     type: "equirectangular",
-    //     panorama: `panos/image${i}.jpg`
-    //   };
-    //   if (i < LAST_SCENE_INDEX) {
-    //     entry.hotSpots = [{
-    //       pitch: 0,
-    //       yaw: 0,
-    //       type: "scene",
-    //       sceneId: `s${i + 1}`,
-    //       text: `Ke Spot ${i + 1}`
-    //     }];
-    //   }
-    //   scenes[sceneId] = entry;
-    // }
-    // var viewer = pannellum.viewer('panorama', {
-    //   "default": {
-    //     "firstScene": "s0",
-    //     "autoLoad": true,
-    //     "showControls": true
-    //   },
-    //   "scenes": scenes
-    // });
-  */
+  const menuBtn = document.getElementById("menuBtn");
+  const menuIcon = document.getElementById("menuIcon");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const menuBackdrop = document.getElementById("menuBackdrop");
 
-  // === Konfigurasi manual dengan hotspot eksplisit ===
-  var viewer = pannellum.viewer('panorama', {
-    "default": {
-      "firstScene": "s0",
-      "autoLoad": true,
-      "showControls": true
-    },
-    "scenes": {
-      "s0":  { 
-        "title": "Jalanan Depan Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/Jalan Depan Rumah.jpg",  
-        "hotSpots": [
-        { "pitch": 0, 
-            "yaw": 0, 
-            "type": "scene", 
-            "sceneId": "s1",  
-            "text": "Ke Halaman Rumah" 
-        }, 
-        {   "pitch": 5.38, 
-            "yaw": 57.28, 
-            "type": "scene", 
-            "sceneId": "s11",  
-            "text": "Ke Samping Kiri Rumah" 
-        }, 
-        {   "pitch": 3.81, 
-            "yaw": -4.52, 
-            "type": "scene", 
-            "sceneId": "s13",  
-            "text": "Ke Samping Kanan Rumah"
-        },
-        {
-            "pitch": -0.38,
-            "yaw": 28.06,
-            "type": "info",
-            "text": "Rumah Adat Kepulauan Kabupaten Selayar merupakan rumah panggung yang terbuat dari bahan kayudan berbentuk persegi panjang memanjang dan atap pelana yang tinggi.<br><br><em>Sumber:</em> <a href=\"https://pariwisata.kepulauanselayarkab.go.id/2015/01/napaktilas-selayar-masa-silam-di-kampung-tua-bitombang/\" target=\"_blank\" rel=\"noopener noreferrer\">Disparbud Selayar - Selayar masa silam di Kampung Tua Bitombang</a>",
-            "URL": "https://pariwisata.kepulauanselayarkab.go.id/2015/01/napaktilas-selayar-masa-silam-di-kampung-tua-bitombang/"
-        },
-        {
-            "pitch": 23.87,
-            "yaw": 30.54,
-            "type": "info",
-            "text": "Atap pelana yang berbentuk prisma segitiga",
-        }   
-        ]},
-      "s1":  { 
-        "title": "Halaman Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/halaman rumah.jpg", 
-        "hotSpots": [
-        { "pitch": -2.78, 
-            "yaw": 29.64, 
-            "type": "scene", 
-            "sceneId": "s2",  
-            "text": "Ke Depan Tangga Rumah" }] 
-        },
-      "s2":  { 
-        "title": "Depan Tangga Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/depan tangga rumah.jpg",  
-        "hotSpots": [
-            { "pitch": 21.14, 
-            "yaw": 86.81, 
-            "type": "scene", 
-            "sceneId": "s3",  
-            "text": "Ke Teras Rumah" 
-          },
-          {
-            "pitch": -3.39,
-            "yaw": 29.90,
-            "type": "info",
-            "text": "Kolong rumah berfungsi sebagai ruang sirkulasi udara dan tempatpenyimpanan barang.",
-          }] 
-        },
-      "s3":  { 
-        "title": "Teras Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/teras rumah.jpg",
-        "hotSpots": [
-        { "pitch": -8.80, 
-            "yaw": 16.30, 
-            "type": "scene", 
-            "sceneId": "s4",  
-            "text": "Ke Pintu Masuk Rumah" 
-        },
-        {
-           "pitch": -12.97,
-            "yaw": -2.71,
-            "type": "info",
-            "text": "Teras rumah yang berbentuk persegi panjang dan digunakan untuk menyambut tamu sebelum masuk ke ruang tengah",
-        }]
-        },
-      "s4":  {
-        "title": "Pintu Masuk Rumah",
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/pintu masuk rumah.jpg",
-        "hotSpots": [
-            { "pitch": -12.39, 
-            "yaw": 39.46, 
-            "type": "scene",
-            "sceneId": "s5",  
-            "text": "Ke Ruang Tengah Rumah" }] 
-        },
-      "s5":  { 
-        "title": "Ruang Tengah Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/ruang tengah rumah.jpg",  
-        "hotSpots": [
-        { "pitch": 0, 
-            "yaw": 0, 
-            "type": "scene", 
-            "sceneId": "s6",  
-            "text": "Ke Ruangan 1" 
-        },
-        { "pitch": -6.79, 
-            "yaw": 57.08, 
-            "type": "scene", 
-            "sceneId": "s7",  
-            "text": "Ke Ruangan 2"
-        },
-        { "pitch": 3.33, 
-            "yaw": 83.06, 
-            "type": "scene", 
-            "sceneId": "s8",  
-            "text": "Ke Dapur Rumah"
-        },
-        {"pitch": -6.42, 
-            "yaw": 116.60,
-            "type": "scene", 
-            "sceneId": "s9",  
-            "text": "Ke Belakang Rumah"
-        },
-        {
-           "pitch": 1.90,
-            "yaw": 163.64,
-            "type": "info",
-            "text": "Ruang tengah merupakan ruang utama rumah yang berbentuk balok dan berfungsi sebagai tempat beraktivitas, tempat kumpul keluarga, dan mengadakan acara adat",
-        }]
-        },
-      "s6":  { 
-        "title": "Ruangan 1",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/ruangan 1.jpg",  
-        "hotSpots": [
-            { "pitch": -6.82, 
-            "yaw": -74.38, 
-            "type": "scene", 
-            "sceneId": "s5",  
-            "text": "Ke Ruang Tengah Rumah" }] 
-        },
-      "s7":  { 
-        "title": "Ruangan 2",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/ruangan 2.jpg",  
-        "hotSpots": [
-            { "pitch": -5.54, 
-            "yaw": -122.49, 
-            "type": "scene", 
-            "sceneId": "s5",  
-            "text": "Ke Ruang Tengah Rumah" }] 
-        },
-      "s8":  { 
-        "title": "Dapur Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/dapur rumah.jpg",  
-        "hotSpots": [
-        {"pitch": -5.97, 
-            "yaw": -124.11,
-            "type": "scene", 
-            "sceneId": "s5",  
-            "text": "Ke Ruang Tengah Rumah"
-        },
-        {
-           "pitch": -7.32,
-            "yaw": 21.73,
-            "type": "info",
-            "text": "Bagian belakang rumah yang berfungsi sebagai dapur dan tempat menyimpan hasil panen.",
-        }]
-        },
-      "s9":  { 
-        "title": "Belakang Rumah",  
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/belakang rumah.jpg",  
-        "hotSpots": [
-            { "pitch": -5.23, 
-            "yaw": -30.45, 
-            "type": "scene", 
-            "sceneId": "s10", 
-            "text": "Ke Sudut Kiri Belakang" }] 
-        },
-      "s10": { 
-        "title": "Sudut Kiri Belakang", 
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/sudut kiri belakang.jpg", 
-        "hotSpots": [
-            { "pitch": -5.85, 
-            "yaw": -10.93, 
-            "type": "scene", 
-            "sceneId": "s11", 
-            "text": "Ke Samping Kiri Rumah" }] 
-        },
-      "s11": { 
-        "title": "Samping Kiri Rumah", 
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/samping kiri rumah.jpg", 
-        "hotSpots": [
-            { "pitch": 0.17,
-            "yaw": -34.23, 
-            "type": "scene", 
-            "sceneId": "s12", 
-            "text": "Ke Sudut Kiri Depan" }] 
-        },
-      "s12": { 
-        "title": "Sudut Kiri Depan", 
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/sudut kiri depan.jpg", 
-        "hotSpots": [
-            { "pitch": 0, 
-            "yaw": 0, 
-            "type": "scene", 
-            "sceneId": "s13", 
-            "text": "Ke Samping Kanan Rumah" }] 
-        },
-      "s13": { 
-        "title": "Samping Kanan Rumah", 
-        "type": "equirectangular", 
-        "panorama": "assets/360_images/samping kanan rumah.jpg" 
-    }
-    }
+  if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+    menuBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      mobileMenu.classList.toggle("open");
+      menuBackdrop.classList.toggle("open");
+      body.classList.toggle("menu-open");
+
+      menuIcon.textContent = mobileMenu.classList.contains("open") ? "×" : "☰";
+    });
+
+    menuBackdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      menuBackdrop.classList.remove("open");
+      body.classList.remove("menu-open");
+      menuIcon.textContent = "☰";
+    });
+  }
+
+  const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+  links.forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+
+      if (!href || href.startsWith("javascript:")) return;
+
+      e.preventDefault();
+
+      body.classList.add("is-leaving");
+      if (overlay) overlay.classList.add("is-active");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 420);
+    });
   });
 
-// Fungsi untuk menampilkan modal minimap
-  function showMinimap() {
-    document.getElementById('minimapModal').classList.add('active');
-  }
-  function hideMinimap() {
-    document.getElementById('minimapModal').classList.remove('active');
-  }
+  window.addEventListener("pageshow", () => {
+    body.classList.remove("is-leaving");
+    body.classList.remove("menu-open");
+    if (overlay) overlay.classList.remove("is-active");
+  });
+});
+</script>
 
-  // === Menampilkan koordinat pitch dan yaw saat panorama di-klik ===
-  const coordDiv = document.createElement('div');
-  coordDiv.style.position = 'fixed';
-  coordDiv.style.bottom = '24px';
-  coordDiv.style.right = '24px';
-  coordDiv.style.background = '#111831cc';
-  coordDiv.style.color = '#22d3ee';
-  coordDiv.style.padding = '10px 18px';
-  coordDiv.style.borderRadius = '10px';
-  coordDiv.style.fontWeight = 'bold';
-  coordDiv.style.zIndex = '2000';
-  coordDiv.style.fontFamily = 'monospace';
-  coordDiv.style.pointerEvents = 'none';
-  coordDiv.textContent = 'Klik panorama untuk koordinat';
+<script>
+var viewer = pannellum.viewer('panorama', {
+  "default": {
+    "firstScene": "s0",
+    "autoLoad": true,
+    "showControls": true
+  },
+
+  "scenes": {
+    "s0": {
+      "title": "Jalanan Depan Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/Jalan Depan Rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": 0,
+          "yaw": 0,
+          "type": "scene",
+          "sceneId": "s1",
+          "text": "Ke Halaman Rumah"
+        },
+        {
+          "pitch": 5.38,
+          "yaw": 57.28,
+          "type": "scene",
+          "sceneId": "s11",
+          "text": "Ke Samping Kiri Rumah"
+        },
+        {
+          "pitch": 3.81,
+          "yaw": -4.52,
+          "type": "scene",
+          "sceneId": "s13",
+          "text": "Ke Samping Kanan Rumah"
+        },
+        {
+          "pitch": -0.38,
+          "yaw": 28.06,
+          "type": "info",
+          "text": "Rumah Adat Kepulauan Kabupaten Selayar merupakan rumah panggung yang terbuat dari bahan kayu dan berbentuk persegi panjang memanjang serta memiliki atap pelana yang tinggi.<br><br><em>Sumber:</em> <a href=\"https://pariwisata.kepulauanselayarkab.go.id/2015/01/napaktilas-selayar-masa-silam-di-kampung-tua-bitombang/\" target=\"_blank\" rel=\"noopener noreferrer\">Disparbud Selayar - Selayar masa silam di Kampung Tua Bitombang</a>"
+        },
+        {
+          "pitch": 23.87,
+          "yaw": 30.54,
+          "type": "info",
+          "text": "Atap pelana yang berbentuk prisma segitiga."
+        }
+      ]
+    },
+
+    "s1": {
+      "title": "Halaman Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/halaman rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": -2.78,
+          "yaw": 29.64,
+          "type": "scene",
+          "sceneId": "s2",
+          "text": "Ke Depan Tangga Rumah"
+        }
+      ]
+    },
+
+    "s2": {
+      "title": "Depan Tangga Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/depan tangga rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": 21.14,
+          "yaw": 86.81,
+          "type": "scene",
+          "sceneId": "s3",
+          "text": "Ke Teras Rumah"
+        },
+        {
+          "pitch": -3.39,
+          "yaw": 29.90,
+          "type": "info",
+          "text": "Kolong rumah berfungsi sebagai ruang sirkulasi udara dan tempat penyimpanan barang."
+        }
+      ]
+    },
+
+    "s3": {
+      "title": "Teras Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/teras rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": -8.80,
+          "yaw": 16.30,
+          "type": "scene",
+          "sceneId": "s4",
+          "text": "Ke Pintu Masuk Rumah"
+        },
+        {
+          "pitch": -12.97,
+          "yaw": -2.71,
+          "type": "info",
+          "text": "Teras rumah berbentuk persegi panjang dan digunakan untuk menyambut tamu sebelum masuk ke ruang tengah."
+        }
+      ]
+    },
+
+    "s4": {
+      "title": "Pintu Masuk Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/pintu masuk rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": -12.39,
+          "yaw": 39.46,
+          "type": "scene",
+          "sceneId": "s5",
+          "text": "Ke Ruang Tengah Rumah"
+        }
+      ]
+    },
+
+    "s5": {
+      "title": "Ruang Tengah Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/ruang tengah rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": 0,
+          "yaw": 0,
+          "type": "scene",
+          "sceneId": "s6",
+          "text": "Ke Ruangan 1"
+        },
+        {
+          "pitch": -6.79,
+          "yaw": 57.08,
+          "type": "scene",
+          "sceneId": "s7",
+          "text": "Ke Ruangan 2"
+        },
+        {
+          "pitch": 3.33,
+          "yaw": 83.06,
+          "type": "scene",
+          "sceneId": "s8",
+          "text": "Ke Dapur Rumah"
+        },
+        {
+          "pitch": -6.42,
+          "yaw": 116.60,
+          "type": "scene",
+          "sceneId": "s9",
+          "text": "Ke Belakang Rumah"
+        },
+        {
+          "pitch": 1.90,
+          "yaw": 163.64,
+          "type": "info",
+          "text": "Ruang tengah merupakan ruang utama rumah yang berbentuk balok dan berfungsi sebagai tempat beraktivitas, berkumpul keluarga, dan mengadakan acara adat."
+        }
+      ]
+    },
+
+    "s6": {
+      "title": "Ruangan 1",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/ruangan 1.jpg",
+      "hotSpots": [
+        {
+          "pitch": -6.82,
+          "yaw": -74.38,
+          "type": "scene",
+          "sceneId": "s5",
+          "text": "Ke Ruang Tengah Rumah"
+        }
+      ]
+    },
+
+    "s7": {
+      "title": "Ruangan 2",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/ruangan 2.jpg",
+      "hotSpots": [
+        {
+          "pitch": -5.54,
+          "yaw": -122.49,
+          "type": "scene",
+          "sceneId": "s5",
+          "text": "Ke Ruang Tengah Rumah"
+        }
+      ]
+    },
+
+    "s8": {
+      "title": "Dapur Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/dapur rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": -5.97,
+          "yaw": -124.11,
+          "type": "scene",
+          "sceneId": "s5",
+          "text": "Ke Ruang Tengah Rumah"
+        },
+        {
+          "pitch": -7.32,
+          "yaw": 21.73,
+          "type": "info",
+          "text": "Bagian belakang rumah berfungsi sebagai dapur dan tempat menyimpan hasil panen."
+        }
+      ]
+    },
+
+    "s9": {
+      "title": "Belakang Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/belakang rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": -5.23,
+          "yaw": -30.45,
+          "type": "scene",
+          "sceneId": "s10",
+          "text": "Ke Sudut Kiri Belakang"
+        }
+      ]
+    },
+
+    "s10": {
+      "title": "Sudut Kiri Belakang",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/sudut kiri belakang.jpg",
+      "hotSpots": [
+        {
+          "pitch": -5.85,
+          "yaw": -10.93,
+          "type": "scene",
+          "sceneId": "s11",
+          "text": "Ke Samping Kiri Rumah"
+        }
+      ]
+    },
+
+    "s11": {
+      "title": "Samping Kiri Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/samping kiri rumah.jpg",
+      "hotSpots": [
+        {
+          "pitch": 0.17,
+          "yaw": -34.23,
+          "type": "scene",
+          "sceneId": "s12",
+          "text": "Ke Sudut Kiri Depan"
+        }
+      ]
+    },
+
+    "s12": {
+      "title": "Sudut Kiri Depan",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/sudut kiri depan.jpg",
+      "hotSpots": [
+        {
+          "pitch": 0,
+          "yaw": 0,
+          "type": "scene",
+          "sceneId": "s13",
+          "text": "Ke Samping Kanan Rumah"
+        }
+      ]
+    },
+
+    "s13": {
+      "title": "Samping Kanan Rumah",
+      "type": "equirectangular",
+      "panorama": "assets/360_images/samping kanan rumah.jpg"
+    }
+  }
+});
+
+function showMinimap() {
+  document.getElementById('minimapModal').classList.add('active');
+}
+
+function hideMinimap() {
+  document.getElementById('minimapModal').classList.remove('active');
+}
+
+const panoramaEl = document.getElementById('panorama');
+const coordDiv = document.createElement('div');
+coordDiv.className = 'coord-hint';
+coordDiv.textContent = 'Klik panorama untuk koordinat';
+
+if (panoramaEl) {
+  panoramaEl.appendChild(coordDiv);
+} else {
   document.body.appendChild(coordDiv);
+}
 
-  const panoramaEl = document.getElementById('panorama');
-  const toggleBtn = document.getElementById('toggleDragBtn');
-  const viewerContainer = typeof viewer.getContainer === 'function'
-    ? viewer.getContainer()
-    : panoramicFallback();
+const toggleBtn = document.getElementById('toggleDragBtn');
+const viewerContainer = typeof viewer.getContainer === 'function'
+  ? viewer.getContainer()
+  : panoramicFallback();
 
-  let dragEnabled = true;
+let dragEnabled = true;
 
-  function panoramicFallback() {
-    return panoramaEl.querySelector('.pnlm-container') || panoramaEl;
-  }
+function panoramicFallback() {
+  return panoramaEl.querySelector('.pnlm-container') || panoramaEl;
+}
 
-  function setCoordHint(message) {
-    coordDiv.textContent = message;
-  }
+function setCoordHint(message) {
+  coordDiv.textContent = message;
+}
 
-  function showCoords(event) {
-    const coords = viewer.mouseEventToCoords(event);
-    if (coords && Number.isFinite(coords.yaw) && Number.isFinite(coords.pitch)) {
-      coordDiv.textContent = `Yaw: ${coords.yaw.toFixed(2)}, Pitch: ${coords.pitch.toFixed(2)}`;
+function showCoords(event) {
+  const coords = viewer.mouseEventToCoords(event);
+
+  if (coords && Number.isFinite(coords.yaw) && Number.isFinite(coords.pitch)) {
+    coordDiv.textContent = `Yaw: ${coords.yaw.toFixed(2)}, Pitch: ${coords.pitch.toFixed(2)}`;
+  } else {
+    const fallbackYaw = typeof viewer.getYaw === 'function' ? viewer.getYaw() : NaN;
+    const fallbackPitch = typeof viewer.getPitch === 'function' ? viewer.getPitch() : NaN;
+
+    if (Number.isFinite(fallbackYaw) && Number.isFinite(fallbackPitch)) {
+      coordDiv.textContent = `Yaw: ${fallbackYaw.toFixed(2)}, Pitch: ${fallbackPitch.toFixed(2)}`;
     } else {
-      const fallbackYaw = typeof viewer.getYaw === 'function' ? viewer.getYaw() : NaN;
-      const fallbackPitch = typeof viewer.getPitch === 'function' ? viewer.getPitch() : NaN;
-      if (Number.isFinite(fallbackYaw) && Number.isFinite(fallbackPitch)) {
-        coordDiv.textContent = `Yaw: ${fallbackYaw.toFixed(2)}, Pitch: ${fallbackPitch.toFixed(2)}`;
-      } else {
-        setCoordHint('Tidak dapat membaca koordinat');
-      }
+      setCoordHint('Tidak dapat membaca koordinat');
     }
   }
+}
 
-  function handlePointer(event) {
-    if (!dragEnabled) {
-      showCoords(event);
-      event.stopPropagation();
-      event.preventDefault();
-    }
+function handlePointer(event) {
+  if (!dragEnabled) {
+    showCoords(event);
+    event.stopPropagation();
+    event.preventDefault();
   }
+}
 
-  function handleScroll(event) {
-    if (!dragEnabled) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
+function handleScroll(event) {
+  if (!dragEnabled) {
+    event.stopPropagation();
+    event.preventDefault();
   }
+}
 
-  const wheelListenerOptions = { capture: true, passive: false };
+const wheelListenerOptions = { capture: true, passive: false };
 
-  function disableDrag() {
-    dragEnabled = false;
-    panoramaEl.style.cursor = 'pointer';
-    viewerContainer.style.cursor = 'pointer';
-    viewerContainer.addEventListener('mousedown', handlePointer, true);
-    viewerContainer.addEventListener('touchstart', handlePointer, true);
-    viewerContainer.addEventListener('click', handlePointer, true);
-    viewerContainer.addEventListener('touchend', handlePointer, true);
-    viewerContainer.addEventListener('wheel', handleScroll, wheelListenerOptions);
-    toggleBtn.textContent = 'Aktifkan Drag';
-    setCoordHint('Mode koordinat aktif — klik panorama');
+function disableDrag() {
+  dragEnabled = false;
+  panoramaEl.style.cursor = 'pointer';
+  viewerContainer.style.cursor = 'pointer';
+  viewerContainer.addEventListener('mousedown', handlePointer, true);
+  viewerContainer.addEventListener('touchstart', handlePointer, true);
+  viewerContainer.addEventListener('click', handlePointer, true);
+  viewerContainer.addEventListener('touchend', handlePointer, true);
+  viewerContainer.addEventListener('wheel', handleScroll, wheelListenerOptions);
+  toggleBtn.textContent = 'Aktifkan Drag';
+  setCoordHint('Mode koordinat aktif — klik panorama');
+}
+
+function enableDrag() {
+  dragEnabled = true;
+  panoramaEl.style.cursor = 'grab';
+  viewerContainer.style.cursor = 'grab';
+  viewerContainer.removeEventListener('mousedown', handlePointer, true);
+  viewerContainer.removeEventListener('touchstart', handlePointer, true);
+  viewerContainer.removeEventListener('click', handlePointer, true);
+  viewerContainer.removeEventListener('touchend', handlePointer, true);
+  viewerContainer.removeEventListener('wheel', handleScroll, wheelListenerOptions);
+  toggleBtn.textContent = 'Nonaktifkan Drag';
+  setCoordHint('Klik panorama untuk koordinat');
+}
+
+toggleBtn.onclick = function() {
+  if (dragEnabled) {
+    disableDrag();
+  } else {
+    enableDrag();
   }
+};
 
-  function enableDrag() {
-    dragEnabled = true;
-    panoramaEl.style.cursor = 'grab';
-    viewerContainer.style.cursor = 'grab';
-    viewerContainer.removeEventListener('mousedown', handlePointer, true);
-    viewerContainer.removeEventListener('touchstart', handlePointer, true);
-    viewerContainer.removeEventListener('click', handlePointer, true);
-    viewerContainer.removeEventListener('touchend', handlePointer, true);
-    viewerContainer.removeEventListener('wheel', handleScroll, wheelListenerOptions);
-    toggleBtn.textContent = 'Nonaktifkan Drag';
-    setCoordHint('Klik panorama untuk koordinat');
-  }
+enableDrag();
 
-  toggleBtn.onclick = function() {
-    if (dragEnabled) {
-      disableDrag();
-    } else {
-      enableDrag();
-    }
-  };
-
-  // Set cursor awal dan pesan bawaan
-  enableDrag();
+document.addEventListener('click', () => {
+  document.querySelectorAll('.hotspot-alert.is-open').forEach((node) => node.classList.remove('is-open'));
+});
 </script>
 
 </body>

@@ -1,48 +1,363 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Rumah Adat Bugis</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/video.css">
+  <title>Video Rumah Adat Selayar</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(35px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-transition {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.08);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      color: #3f3f46;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .video-header {
+      animation: fadeSlideUp 650ms ease both;
+    }
+
+    .video-content {
+      animation: fadeSlideUp 850ms ease both;
+      animation-delay: 120ms;
+    }
+
+    .video-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 30px;
+      box-shadow: 0 24px 60px rgba(120, 53, 15, 0.16);
+      padding: 18px;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #111827;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 18px 45px rgba(120, 53, 15, 0.18);
+    }
+
+    .video-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+
+      .video-card {
+        padding: 12px;
+        border-radius: 22px;
+      }
+
+      .video-frame {
+        border-radius: 18px;
+      }
+    }
+  </style>
 </head>
-<body>
 
-<!-- HEADER -->    
-<header class="video-header">
-  <a href="index.html" class="btn btn-outline">
-    ← Kembali ke Beranda
-  </a>
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition min-h-screen">
 
-  <h1 class="video-title">
-    Video<br>
-    Rumah Adat<br>
-    Bugis
-  </h1>
+<header class="video-header sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
 
-  <a 
-    href="https://youtu.be/gmegBXKW7Zw"
-    target="_blank"
-    class="btn btn-primary">
-    Buka di YouTube
-  </a>
+    <div class="flex items-center gap-4">
+      <button 
+        id="menuBtn"
+        type="button"
+        class="pressable inline-flex h-12 w-12 items-center justify-center rounded-xl border border-amber-200 bg-white/80 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50"
+        aria-label="Buka menu"
+      >
+        <span id="menuIcon" class="text-3xl leading-none">☰</span>
+      </button>
+
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-zinc-900">
+          Rumah Adat Selayar
+        </h1>
+        <p class="text-xs tracking-[0.25em] text-amber-700">
+          Benteng Somba Opu
+        </p>
+      </div>
+    </div>
+
+    <img 
+      src="assets/images/logo.png" 
+      alt="Logo Lembaga"
+      class="h-12 w-12 object-contain shrink-0"
+    >
+  </div>
 </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="video-page">
-    <section class="video-card">
-      <div class="video-frame">
-        <iframe
-            src="https://www.youtube.com/embed/gmegBXKW7Zw"
-            title="Video Rumah Adat Bugis"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-        </iframe>
-      </div>
-      <p class="video-caption">Tonton dokumentasi singkat Rumah Adat Bugis untuk melihat detail eksterior, interior, dan konteks budaya dalam satu video.</p>
-    </section>
-  </main>
+<div id="menuBackdrop" class="menu-backdrop"></div>
+
+<aside id="mobileMenu" class="side-menu">
+  <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+    <a href="index.html" class="menu-link">Beranda</a>
+    <a href="vtour.html" class="menu-link">Tur Virtual</a>
+    <a href="artcle.html" class="menu-link">Artikel Matematika</a>
+    <a href="projective.html" class="menu-link">Projective Geometry</a>
+    <a href="desain3d.html" class="menu-link">3D Desain</a>
+    <a href="video.html" class="menu-link">Video Drone</a>
+  </nav>
+</aside>
+
+<main class="video-content max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+  <section class="max-w-4xl mx-auto text-center mb-8">
+    <p class="inline-flex items-center justify-center rounded-full border border-amber-500 px-5 py-2 text-xs sm:text-sm font-semibold tracking-[0.22em] text-amber-800 mb-5">
+      VIDEO DOKUMENTASI
+    </p>
+
+    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-amber-900 leading-tight mb-5">
+      Video Rumah Adat Selayar
+    </h2>
+
+    <p class="max-w-3xl mx-auto text-zinc-600 leading-7 sm:leading-8 text-justify">
+      Halaman ini menampilkan dokumentasi video Rumah Adat Selayar sebagai media visual untuk
+      memahami bentuk rumah panggung, struktur kayu, ruang, detail arsitektur, dan konteks budaya
+      masyarakat Kepulauan Selayar. Video ini membantu pengunjung melihat rumah adat secara lebih
+      nyata melalui tampilan audiovisual.
+    </p>
+
+    <div class="mt-7 flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="index.html"
+         class="pressable inline-flex items-center justify-center rounded-xl border border-amber-700 px-7 py-3.5 text-sm sm:text-base font-semibold text-amber-800 transition duration-300 hover:bg-amber-100 hover:-translate-y-0.5">
+        ← Kembali ke Beranda
+      </a>
+
+      <a href="https://youtu.be/gmegBXKW7Zw"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="pressable inline-flex items-center justify-center rounded-xl bg-amber-700 px-7 py-3.5 text-sm sm:text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition duration-300 hover:bg-amber-800 hover:-translate-y-0.5">
+        Buka di YouTube
+      </a>
+    </div>
+  </section>
+
+  <section class="video-card max-w-5xl mx-auto">
+    <div class="video-frame">
+      <iframe
+        src="https://www.youtube.com/embed/gmegBXKW7Zw"
+        title="Video Rumah Adat Selayar"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <p class="mt-5 text-zinc-600 leading-7 sm:leading-8 text-justify">
+      Tonton dokumentasi singkat Rumah Adat Selayar untuk melihat detail eksterior,
+      interior, struktur rumah panggung, serta konteks budaya dalam satu video.
+    </p>
+  </section>
+
+</main>
+
+<footer class="mt-20 bg-zinc-900 text-zinc-300">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+    <p>© 2025 · Video Dokumentasi Rumah Adat Selayar</p>
+
+    <p>
+      <a 
+        href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/" 
+        target="_blank"
+        class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+      >
+        Benteng Somba Opu
+      </a>
+    </p>
+  </div>
+</footer>
+
+<div id="pageOverlay" class="page-overlay"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  const overlay = document.getElementById("pageOverlay");
+
+  const menuBtn = document.getElementById("menuBtn");
+  const menuIcon = document.getElementById("menuIcon");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const menuBackdrop = document.getElementById("menuBackdrop");
+
+  if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+    menuBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      mobileMenu.classList.toggle("open");
+      menuBackdrop.classList.toggle("open");
+      body.classList.toggle("menu-open");
+
+      menuIcon.textContent = mobileMenu.classList.contains("open") ? "×" : "☰";
+    });
+
+    menuBackdrop.addEventListener("click", () => {
+      mobileMenu.classList.remove("open");
+      menuBackdrop.classList.remove("open");
+      body.classList.remove("menu-open");
+      menuIcon.textContent = "☰";
+    });
+  }
+
+  const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+  links.forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href");
+
+      if (!href || href.startsWith("javascript:")) return;
+
+      e.preventDefault();
+
+      body.classList.add("is-leaving");
+      if (overlay) overlay.classList.add("is-active");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 420);
+    });
+  });
+
+  window.addEventListener("pageshow", () => {
+    body.classList.remove("is-leaving");
+    body.classList.remove("menu-open");
+    if (overlay) overlay.classList.remove("is-active");
+  });
+});
+</script>
+
 </body>
 </html>
